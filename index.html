@@ -7,9 +7,162 @@
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
   </head>
   <body class="mixpanel-platform-body">
-    <h1>Hello, World!</h1>
+    
+    <div class="mixpanel-platform-section">
+      <h1>Total Page Views</h1>
+      <div style="clear: both;"></div>
+      <div id="PageViews" class="report"></div>
+      <h1>Article & Message Board Clicks</h1>
+      <div style="clear: both;"></div>
+      <div id="Content" class="report"></div>
+      <h1>Top 10 Content Items of the Week</h1>
+      <div style="clear: both;"></div>
+      <div id="TopContent" class="report"></div>
+      <h1>Content by Initial Referrer</h1>
+      <div style="clear: both;"></div>
+      <div id="ContentbyInitialReferrer" class="report"></div>
+      <h1>Content by Operating System</h1>
+      <div style="clear: both;"></div>
+      <div id="ContentbyOS" class="report"></div>
+    </div>
+    <div class="mixpanel-platform-section">
+      <h1>Promotions Used</h1>
+      <div style="clear: both;"></div>
+      <div id="SubSuccess" class="report"></div>
+      <h1>Lapsed vs. Unlapsed Users</h1>
+      <div style="clear: both;"></div>
+      <div id="LapsedVSUnlapsed" class="report"></div>
+    </div>
+    <style>
+    h1 {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+    .report {
+     margin: 15px 0; 
+    }
+    </style>
     <script>
-      // Run queries and display results here
+      var PageViewsLine  = $('#PageViews').MPChart({chartType: 'line'});
+      var ContentLine  = $('#Content').MPChart({chartType: 'line'});
+      var TopContentBar  = $('#TopContent').MPChart({chartType: 'bar'});
+      var ContentbyInitialReferrerBar  = $('#ContentbyInitialReferrer').MPChart({chartType: 'bar'});
+      var ContentbyOSBar  = $('#ContentbyOS').MPChart({chartType: 'bar'});
+      var SubSuccessLine  = $('#SubSuccess').MPChart({chartType: 'line'});
+      var LapsedVSUnlapsedLine  = $('#LapsedVSUnlapsed').MPChart({chartType: 'line'});
+     
+      var segmentPageViewsParams = {
+            from: moment().subtract('30', 'days'),
+            to: moment(),
+            type: 'general',
+            unit: 'day',
+            where: 'properties["$country"] == "United States"',
+      };
+      
+      var eventsContentParams = {
+            from: moment().subtract('7', 'days'),
+            to: moment(),
+            type: 'general',
+            unit: 'day',
+            where: 'properties["team_affiliated"] == "Alabama"',
+      };
+      
+      var segmentTopContentParams = {
+            from: moment().subtract('30', 'days'),
+            to: moment(),
+            limit: '10',
+            type: 'general',
+            unit: 'day',
+            where: 'properties["team_affiliated"] == "Alabama"' ,
+      };
+      
+      var segmentContentbyInitialReferrerParams = {
+            from: moment().subtract('30', 'days'),
+            to: moment(),
+            limit: '10',
+            type: 'general',
+            unit: 'day',
+            where: 'properties["team_affiliated"] == "Alabama"' ,
+      };
+      
+      var segmentContentbyOSParams = {
+            from: moment().subtract('30', 'days'),
+            to: moment(),
+            limit: '10',
+            type: 'general',
+            unit: 'day',
+            where: 'properties["team_affiliated"] == "Alabama"' ,
+      };
+      
+      var eventsSubSuccessParams = {
+            from: moment().subtract('30', 'days'),
+            to: moment(),
+            type: 'general',
+            unit: 'day',
+            where: 'properties["team_affiliated"] == "Alabama"',
+      };
+
+      var eventsLapsedVSUnlapsedParams = {
+            from: moment().subtract('30', 'days'),
+            to: moment(),
+            type: 'general',
+            unit: 'day',
+            where: 'properties["team_affiliated"] == "Alabama"',
+      };
+
+      runQuery();
+       function runQuery() {
+        
+        //Page View Data
+        
+        MP.api.segment('Item Detail Page', segmentPageViewsParams).done(function(results) {
+            
+            PageViewsLine.MPChart('setData', results)
+        });
+        
+        //Content Data
+        
+        MP.api.events('$custom_event:125637', '$custom_event:125635', eventsContentParams).done(function(results) {
+            
+            ContentLine.MPChart('setData', results);
+        });
+            
+        //Top Content Data
+        
+        MP.api.segment('Content', 'Title', segmentTopContentParams).done(function(results) {
+            
+            TopContentBar.MPChart('setData', results);
+        });
+        
+        //Content by Initial Referrer Data
+        
+        MP.api.segment('Content', '$initial_referrer', segmentContentbyInitialReferrerParams).done(function(results) {
+            
+            ContentbyInitialReferrerBar.MPChart('setData', results);
+        });
+        
+        //Content by OS Data
+        
+        MP.api.segment('Content', '$os', segmentContentbyOSParams).done(function(results) {
+            
+            ContentbyOSBar.MPChart('setData', results);
+        });
+        
+        //Sub Success Data
+        
+        MP.api.events('Sub Success', '$custom_event:63785', eventsSubSuccessParams).done(function(results) {
+            
+            SubSuccessLine.MPChart('setData', results);
+        });
+        
+        //Lapsed Data
+        
+        MP.api.events('Lapsed User', 'Unlapsed User', eventsLapsedVSUnlapsedParams).done(function(results) {
+            
+            LapsedVSUnlapsedLine.MPChart('setData', results);
+        });
+       }
+
     </script>
   </body>
 </html>
